@@ -1,0 +1,12 @@
+flask
+langchain
+langchain-community
+langchain-huggingface
+sentence-transformers
+transformers
+faiss-cpu
+accelerate
+huggingface-hub
+tqdm
+typing-extensions
+pypdf

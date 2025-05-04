@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KhoKhoBot Chat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0d0d0d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .main-layout {
+      display: flex;
+      width: 90%;
+      height: 90vh;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 25px #ffd700;
+    }
+
+    .avatar-pane {
+      flex: 1;
+      background-color: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-right: 2px solid #ffd700;
+    }
+
+    .avatar-pane img {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      box-shadow: 0 0 25px #ffd700;
+      transition: transform 0.3s ease;
+    }
+
+    .avatar-speaking {
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.07); }
+      100% { transform: scale(1); }
+    }
+
+    .container {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background-color: #262626;
+      border-top-right-radius: 20px;
+      border-bottom-right-radius: 20px;
+    }
+
+    .chat-header {
+      background: #ffd700;
+      color: #000000;
+      text-align: center;
+      padding: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      border-top-right-radius: 20px;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-message {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      max-width: 75%;
+      word-wrap: break-word;
+    }
+
+    .bot-message {
+      align-self: flex-start;
+      background: #ffd700;
+      color: #000000;
+    }
+
+    .user-message {
+      align-self: flex-end;
+      background: #555555;
+      color: #ffffff;
+    }
+
+    .bot-avatar-inline {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      box-shadow: 0 0 5px #ffd700;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      background: #1a1a1a;
+      border-top: 1px solid #ffd700;
+      border-bottom-right-radius: 20px;
+    }
+
+    .chat-input input {
+      flex-grow: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #333333;
+      color: #ffd700;
+      outline: none;
+    }
+
+    .chat-input button {
+      margin-left: 10px;
+      padding: 10px;
+      background: #ffd700;
+      color: #0d0d0d;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .chat-input button:hover {
+      background: #e6c200;
+    }
+
+    .bot-image, .bot-video {
+      max-width: 100%;
+      border-radius: 5px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div class="avatar-pane">
+      <img id="avatar" src="/static/avatar.jpg" alt="KhoKhoBot Avatar" />
+    </div>
+    <div class="container">
+      <div class="chat-header">KhoKhoBot</div>
+      <div class="chat-box" id="chat-box">
+        <div class="chat-message bot-message">
+          <img src="/static/avatar.jpg" class="bot-avatar-inline" />
+          <div>{{ initial_message }}</div>
+        </div>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="user-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)" />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handleKeyPress(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    }
+
+    function sendMessage() {
+      const userInput = document.getElementById("user-input");
+      const message = userInput.value.trim();
+      if (message === "") return;
+
+      const chatBox = document.getElementById("chat-box");
+
+      const userMessageDiv = document.createElement("div");
+      userMessageDiv.className = "chat-message user-message";
+      userMessageDiv.textContent = message;
+      chatBox.appendChild(userMessageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      userInput.value = "";
+
+      fetch("/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: message })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const avatar = document.getElementById("avatar");
+        avatar.classList.add("avatar-speaking");
+
+        const botMessageDiv = document.createElement("div");
+        botMessageDiv.className = "chat-message bot-message";
+
+        const avatarImg = document.createElement("img");
+        avatarImg.src = "/static/avatar.jpg";
+        avatarImg.className = "bot-avatar-inline";
+
+        const botText = document.createElement("div");
+        botText.textContent = "";
+
+        botMessageDiv.appendChild(avatarImg);
+        botMessageDiv.appendChild(botText);
+        chatBox.appendChild(botMessageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        const fullText = data.message;
+        let i = 0;
+        const typingSpeed = 25;
+
+        function typeCharacter() {
+          if (i < fullText.length) {
+            botText.textContent += fullText.charAt(i);
+            i++;
+            chatBox.scrollTop = chatBox.scrollHeight;
+            setTimeout(typeCharacter, typingSpeed);
+          } else {
+            avatar.classList.remove("avatar-speaking");
+
+            if (data.image) {
+              const imageElement = document.createElement("img");
+              imageElement.src = data.image;
+              imageElement.className = "bot-image";
+              chatBox.appendChild(imageElement);
+            }
+
+            if (data.video) {
+              const videoElement = document.createElement("video");
+              videoElement.src = data.video;
+              videoElement.className = "bot-video";
+              videoElement.controls = true;
+              chatBox.appendChild(videoElement);
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+          }
+        }
+
+        typeCharacter();
+      });
+    }
+  </script>
+</body>
+</html>
