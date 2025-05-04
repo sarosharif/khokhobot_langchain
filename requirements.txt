@@ -9,4 +9,5 @@ accelerate
 huggingface-hub
 tqdm
 typing-extensions
-pypdf
+gunicorn
+
