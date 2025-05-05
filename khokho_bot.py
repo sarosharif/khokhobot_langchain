@@ -69,32 +69,23 @@ def index():
     )
 
 @app.route("/chat", methods=["POST"])
-@app.route("/chat", methods=["POST"])
 def chat():
     user_input = request.json.get("message", "").strip()
     if not user_input:
         return jsonify({"message": "Please say something about Kho-Kho!"})
-
+    print(session)
     # Name detection (store once)
     if "username" not in session:
-        for pat in (
-            r"\bmy name is\s+([A-Za-z]{2,20})\b",
-            r"\bi am\s+([A-Za-z]{2,20})\b",
-            r"\bi'm\s+([A-Za-z]{2,20})\b",
-            r"\bthis is\s+([A-Za-z]{2,20})\b",
-        ):
-            m = re.search(pat, user_input, re.IGNORECASE)
-            if m:
-                session["username"] = m.group(1).strip().capitalize()
-                return jsonify({"message": "Nice to meet you! I can answer your Kho-Kho questions."})
-
-        stripped = user_input.strip()
-        if re.fullmatch(r"[A-Za-z]{2,20}", stripped):
-            session["username"] = stripped.capitalize()
-            return jsonify({"message": "Nice to meet you! I can answer your Kho-Kho questions."})
-
+        m = re.match(r"my name is\s+([A-Za-z]{2,20})", user_input, re.IGNORECASE)
+        if m:
+            session["username"] = m.group(1).capitalize()
+            return jsonify({"message": f"Nice to meet you, {session['username']}! I can answer your Kho-Kho related questions."})
+        else:
+            return jsonify({"message": "Please enter your name in the format: My name is <YourName>."})
     name = session.get("username", "friend")
-
+    if re.search(r"\b(bye|exit|quit|goodbye)\b", user_input, re.IGNORECASE):
+        session.clear()  # This clears all session data, including username and flags
+        return jsonify({"message": "Goodbye! Your session has ended."})
     # Retrieve relevant context
     docs = retriever.get_relevant_documents(user_input)
     if not docs:
