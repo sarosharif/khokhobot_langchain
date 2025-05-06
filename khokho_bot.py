@@ -62,6 +62,7 @@ retriever = vectorstore.as_retriever()
 @app.route("/")
 def index():
     greeting = get_greeting()
+    session.clear() 
     return render_template(
         "index.html",
         initial_message=f"{greeting}! I'm Khokho-Bot. What's your name?",
