@@ -261,10 +261,7 @@
     <div class="container">
       <div class="chat-header">KhoKhoBot</div>
       <div class="chat-box" id="chat-box">
-        <div class="chat-message bot-message">
-          <img src="/static/avatar.png" class="bot-avatar-inline" />
-          <div>{{ initial_message }}</div>
-        </div>
+        <!-- Bot greeting will be inserted here via JS -->
       </div>
       <div class="chat-input">
         <input type="text" id="user-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)" />
@@ -280,6 +277,38 @@
   </div>
 
   <script>
+    function insertBotMessage(text) {
+      const chatBox = document.getElementById("chat-box");
+      const botMessageDiv = document.createElement("div");
+      botMessageDiv.className = "chat-message bot-message";
+
+      const avatarImg = document.createElement("img");
+      avatarImg.src = "/static/avatar.png";
+      avatarImg.className = "bot-avatar-inline";
+
+      const botText = document.createElement("div");
+      botText.textContent = text;
+
+      botMessageDiv.appendChild(avatarImg);
+      botMessageDiv.appendChild(botText);
+      chatBox.appendChild(botMessageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Set timezone and get greeting
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    fetch("/timezone", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ timezone: timezone })
+    })
+    .then(() => fetch("/greeting"))
+    .then(res => res.json())
+    .then(data => {
+      insertBotMessage(`${data.greeting}! I'm Khokho-Bot. What's your name?`);
+    });
+
     function handleKeyPress(event) {
       if (event.key === "Enter") {
         sendMessage();

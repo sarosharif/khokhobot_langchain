@@ -2,12 +2,14 @@
 import os
 import json
 import re
+import pytz
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, session, url_for
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 from langchain_community.vectorstores import FAISS
 from langchain.memory import ConversationBufferMemory
 from langchain.schema import Document
+from pytz import timezone as pytz_timezone, UnknownTimeZoneError
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.llms import HuggingFacePipeline
 
@@ -23,16 +25,22 @@ app.secret_key = SECRET_KEY
 
 # --- Utility Functions ---
 def get_greeting():
-    now_hour = datetime.now().hour
-    if now_hour < 12:
+    user_tz_name = session.get("timezone", "UTC")
+    try:
+        user_tz = pytz.timezone(user_tz_name)
+    except pytz.UnknownTimeZoneError:
+        user_tz = pytz.utc
+    user_time = datetime.now(user_tz)
+    hour = user_time.hour
+    if hour < 12:
         return "Good morning"
-    if now_hour < 17:
+    elif hour < 17:
         return "Good afternoon"
-    return "Good evening"
+    else:
+        return "Good evening"
 
 # --- Data Loading ---
 def load_documents(path: str):
-    """Load Q&A pairs from JSON into Document list."""
     with open(path, encoding="utf-8") as f:
         records = json.load(f).get("conversations", [])
     return [Document(page_content=f"Q: {q}\nA: {a}") for q, a in records]
@@ -41,8 +49,6 @@ documents = load_documents(JSON_DATA_FILE)
 
 # --- Embeddings & LLM Setup ---
 embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
-
-# Initialize the Flan-T5 pipeline
 _tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL)
 _model = AutoModelForSeq2SeqLM.from_pretrained(LLM_MODEL)
 _pipe = pipeline(
@@ -50,7 +56,7 @@ _pipe = pipeline(
     model=_model,
     tokenizer=_tokenizer,
     max_new_tokens=MAX_TOKENS,
-)  # careful: GPU/CPU memory
+)
 llm = HuggingFacePipeline(pipeline=_pipe)
 
 # --- Vector Store & Memory ---
@@ -61,13 +67,20 @@ retriever = vectorstore.as_retriever()
 # --- Flask Routes ---
 @app.route("/")
 def index():
-    greeting = get_greeting()
-    session.clear() 
-    return render_template(
-        "index.html",
-        initial_message=f"{greeting}! I'm Khokho-Bot. What's your name?",
-        video=None,
-    )
+    return render_template("index.html", initial_message="", video=None)
+
+@app.route("/timezone", methods=["POST"])
+def set_timezone():
+    tz = request.json.get("timezone", "")
+    try:
+        session["timezone"] = tz if tz else "UTC"
+    except UnknownTimeZoneError:
+        session["timezone"] = "UTC"
+    return jsonify({"status": "ok"})
+
+@app.route("/greeting", methods=["GET"])
+def greeting():
+    return jsonify({"greeting": get_greeting()})
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -75,7 +88,6 @@ def chat():
     if not user_input:
         return jsonify({"message": "Please say something about Kho-Kho!"})
     print(session)
-    # Name detection (store once)
     if "username" not in session:
         m = re.match(r"my name is\s+([A-Za-z]{2,20})", user_input, re.IGNORECASE)
         if m:
@@ -85,9 +97,9 @@ def chat():
             return jsonify({"message": "Please enter your name in the format: My name is <YourName>."})
     name = session.get("username", "friend")
     if re.search(r"\b(bye|exit|quit|goodbye)\b", user_input, re.IGNORECASE):
-        session.clear()  # This clears all session data, including username and flags
+        session.clear()
         return jsonify({"message": "Goodbye! Your session has ended."})
-    # Retrieve relevant context
+
     docs = retriever.get_relevant_documents(user_input)
     if not docs:
         fallback = (
@@ -99,17 +111,13 @@ def chat():
     context = "\n\n".join(doc.page_content for doc in docs)
     enforced = "Only discuss Kho-Kho. Redirect back to Kho-Kho if off-topic.\n"
     need_video = bool(re.search(r"\b(rules|how to play|video)\b", user_input, re.I))
-
-    # Check if user has already received the video
     show_video = need_video and not session.get("video_sent", False)
-
     if show_video:
         session["video_sent"] = True
     elif re.search(r"\b(show|play|video)\b", user_input, re.I):
-        show_video = True  # allow re-show on explicit request
+        show_video = True
 
     implicit = "Context: rules and gameplay details.\n" if need_video else ""
-
     prompt = (
         f"You are Khokho-Bot answering {name} about Kho-Kho.\n"
         f"{enforced}\n"
@@ -117,7 +125,6 @@ def chat():
         f"Context:\n{context}\n"
         f"Question: {user_input}\nAnswer:"
     )
-
     raw = llm.invoke(prompt).strip()
     answer = (
         f"I didn't catch that, {name}. Can you ask about Kho-Kho again?"
