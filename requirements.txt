@@ -10,4 +10,5 @@ huggingface-hub
 tqdm
 typing-extensions
 gunicorn
+pytz
 
