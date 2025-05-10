@@ -5,232 +5,262 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KhoKhoBot Chat</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+  * {
+    box-sizing: border-box;
+  }
 
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(120deg, #1a0025, #290033, #1a0025);
-      background-size: 400% 400%;
-      animation: backgroundShift 30s ease infinite;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 10px;
-    }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(120deg, #130b03, #1d140a, #130b03);
+    background-size: 400% 400%;
+    animation: gradientShift 30s ease infinite;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 10px;
+    color: #f8e8d0;
+  }
 
-    @keyframes backgroundShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
 
+  .main-layout {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 1000px;
+    height: 90vh;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: rgba(20, 12, 6, 0.95);
+    box-shadow: 0 0 25px rgba(255, 140, 0, 0.15);
+    border: 1px solid #8b5a2b;
+    backdrop-filter: blur(6px);
+  }
+
+  .avatar-pane {
+    flex: 1;
+    background-color: #2c2118;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .avatar-pane img {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 4px solid #ff8c00;
+    box-shadow: 0 0 18px #ff9a33;
+  }
+
+  .container {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(36, 24, 16, 0.92);
+  }
+
+  .chat-header {
+    background: #c17e38;
+    color: #000;
+    text-align: center;
+    padding: 14px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .chat-box {
+    flex-grow: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background-color: rgba(255, 248, 240, 0.02);
+  }
+
+  .chat-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    max-width: 75%;
+    word-wrap: break-word;
+  }
+
+  .bot-message {
+    align-self: flex-start;
+    background: #3e2a1c;
+    color: #ffeacc;
+    border-left: 4px solid #ffb84d;
+  }
+
+  .user-message {
+    align-self: flex-end;
+    background: #5a3924;
+    color: #fff5e1;
+    border-right: 4px solid #ffc680;
+  }
+
+  .bot-avatar-inline {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #ff8c00;
+  }
+
+  .chat-input {
+    display: flex;
+    padding: 10px;
+    background: #2a1c13;
+    border-top: 1px solid #a05a2c;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .chat-input input {
+    flex-grow: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #3d2b1a;
+    color: #ffe5b4;
+    outline: none;
+    font-size: 15px;
+  }
+
+  .chat-input button {
+    padding: 12px 16px;
+    background: #e28c3f;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .chat-input button:hover {
+    background-color: #ffb84d;
+  }
+
+  .bot-image, .bot-video {
+    max-width: 100%;
+    border-radius: 6px;
+    margin-top: 6px;
+    box-shadow: 0 0 10px #e28c3f;
+  }
+
+  .feedback-section {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .feedback-button {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+    background-color: #ffb84d;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 0 10px #ffd9a0;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+
+  .feedback-button:hover {
+    background-color: #ffcc7f;
+    transform: translateY(-2px);
+  }
+
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffeacc;
+    margin-top: 10px;
+  }
+
+  .typing-indicator .dot {
+    width: 8px;
+    height: 8px;
+    background-color: #ffc680;
+    border-radius: 50%;
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+
+  .typing-indicator .dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .typing-indicator .dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+  }
+
+  @media (max-width: 768px) {
     .main-layout {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-      max-width: 1000px;
-      height: 90vh;
-      border-radius: 20px;
-      overflow: hidden;
-      background-color: rgba(30, 0, 45, 0.95);
-      box-shadow: 0 0 30px rgba(255, 105, 180, 0.4);
-      backdrop-filter: blur(8px);
+      flex-direction: column;
+      height: auto;
     }
 
     .avatar-pane {
-      flex: 1;
-      background-color: rgba(20, 0, 30, 0.9);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-right: 2px solid #aa66ff;
-      padding: 20px;
+      border-bottom: 2px solid #b36b00;
     }
 
     .avatar-pane img {
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      box-shadow: 0 0 20px #ff99ff;
-    }
-
-    .container {
-      flex: 2;
-      display: flex;
-      flex-direction: column;
-      background-color: rgba(40, 0, 60, 0.85);
-    }
-
-    .chat-header {
-      background: linear-gradient(90deg, #cc66ff, #ff66cc);
-      color: #fff;
-      text-align: center;
-      padding: 14px;
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    .chat-box {
-      flex-grow: 1;
-      padding: 16px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      width: 120px;
+      height: 120px;
     }
 
     .chat-message {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      max-width: 75%;
-      word-wrap: break-word;
-    }
-
-    .bot-message {
-      align-self: flex-start;
-      background: #ffccff18;
-      color: #fff;
-      border-left: 3px solid #ff66cc;
-    }
-
-    .user-message {
-      align-self: flex-end;
-      background: #444;
-      color: #fff;
-      border-right: 3px solid #66ccff;
-    }
-
-    .bot-avatar-inline {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      box-shadow: 0 0 6px #ff99ff;
+      max-width: 100%;
+      font-size: 14px;
     }
 
     .chat-input {
-      display: flex;
-      padding: 10px;
-      background: #1a1a2a;
-      border-top: 1px solid #aa66ff;
-      gap: 10px;
-      flex-wrap: wrap;
+      flex-direction: column;
     }
 
-    .chat-input input {
-      flex-grow: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 6px;
-      background: #333;
-      color: #fff;
-      outline: none;
-      font-size: 15px;
+    .chat-input input, .chat-input button {
+      width: 100%;
     }
 
-    .chat-input button {
-      padding: 12px 16px;
-      background: #cc66ff;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .chat-input button:hover {
-      background-color: #e600e6;
-    }
-
-    .bot-image, .bot-video {
-      max-width: 100%;
-      border-radius: 6px;
-      margin-top: 6px;
-      box-shadow: 0 0 10px #cc66ff;
-    }
-
-    .feedback-section {
-      text-align: center;
-      margin-top: 20px;
+    .chat-header {
+      border-radius: 0;
     }
 
     .feedback-button {
-      display: inline-block;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #fff;
-      background-color: #ff66cc;
-      border: none;
-      border-radius: 8px;
-      text-decoration: none;
-      box-shadow: 0 0 10px #ff99ff;
-      transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
+      width: 80%;
+      font-size: 14px;
     }
-
-    .feedback-button:hover {
-      background-color: #e600e6;
-      box-shadow: 0 0 15px #ffccff;
-      transform: translateY(-2px);
-    }
-
-    @media (max-width: 768px) {
-      .main-layout {
-        flex-direction: column;
-        height: auto;
-      }
-
-      .avatar-pane {
-        border-right: none;
-        border-bottom: 2px solid #aa66ff;
-      }
-
-      .avatar-pane img {
-        width: 120px;
-        height: 120px;
-      }
-
-      .chat-message {
-        max-width: 100%;
-        font-size: 14px;
-      }
-
-      .chat-input {
-        flex-direction: column;
-      }
-
-      .chat-input input, .chat-input button {
-        width: 100%;
-      }
-
-      .chat-header {
-        border-radius: 0;
-      }
-
-      .feedback-button {
-        width: 80%;
-        font-size: 14px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
   <div class="main-layout">
     <div class="avatar-pane">
-      <img id="avatar" src="/static/avatar.jpg" alt="KhoKhoBot Avatar" />
+      <img id="avatar" src="/static/avatar.png" alt="KhoKhoBot Avatar" />
     </div>
     <div class="container">
       <div class="chat-header">KhoKhoBot</div>
       <div class="chat-box" id="chat-box">
         <div class="chat-message bot-message">
-          <img src="/static/avatar.jpg" class="bot-avatar-inline" />
+          <img src="/static/avatar.png" class="bot-avatar-inline" />
           <div>{{ initial_message }}</div>
         </div>
       </div>
@@ -268,6 +298,19 @@
       chatBox.scrollTop = chatBox.scrollHeight;
       userInput.value = "";
 
+      // Typing indicator
+      const typingIndicator = document.createElement("div");
+      typingIndicator.className = "typing-indicator";
+      typingIndicator.id = "typing-indicator";
+      typingIndicator.innerHTML = `
+        <img src="/static/avatar.png" class="bot-avatar-inline" />
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      `;
+      chatBox.appendChild(typingIndicator);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
       fetch("/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -278,11 +321,14 @@
         const avatar = document.getElementById("avatar");
         avatar.classList.add("avatar-speaking");
 
+        const typingEl = document.getElementById("typing-indicator");
+        if (typingEl) typingEl.remove();
+
         const botMessageDiv = document.createElement("div");
         botMessageDiv.className = "chat-message bot-message";
 
         const avatarImg = document.createElement("img");
-        avatarImg.src = "/static/avatar.jpg";
+        avatarImg.src = "/static/avatar.png";
         avatarImg.className = "bot-avatar-inline";
 
         const botText = document.createElement("div");
