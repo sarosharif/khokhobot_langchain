@@ -65,6 +65,7 @@
     display: flex;
     flex-direction: column;
     background-color: rgba(36, 24, 16, 0.92);
+    height: 100%;
   }
 
   .chat-header {
@@ -78,6 +79,7 @@
 
   .chat-box {
     flex-grow: 1;
+    min-height: 0;
     padding: 16px;
     overflow-y: auto;
     display: flex;
@@ -298,7 +300,6 @@
       chatBox.scrollTop = chatBox.scrollHeight;
       userInput.value = "";
 
-      // Typing indicator
       const typingIndicator = document.createElement("div");
       typingIndicator.className = "typing-indicator";
       typingIndicator.id = "typing-indicator";

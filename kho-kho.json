@@ -33,6 +33,10 @@
       "The Kho-Kho court is 27 meters long and 16 meters wide. Two wooden poles are placed at either end of the central lane, and the central lane is 30 centimeters wide. The sitting players are spaced evenly with a distance of 1.5 meters between them."
     ],
     [
+      "Give me more info about kho-kho",
+      "Kho-Kho is a traditional tag sport that originated in the Indian subcontinent, often played on a rectangular field with two teams of nine players each. The objective is for one team (the chasers) to tag all the players of the opposing team (the defenders) within a set time using strategic movement and teamwork. A unique feature of Kho-Kho is that the chasers sit in a line, alternating in direction, and only one active chaser can run at a time. The active chaser can pass the role to a sitting teammate by touching them and saying “Kho.” This creates a fast-paced game that relies heavily on speed, agility, and quick decision-making.Kho-Kho is especially popular in schools and rural areas and is governed internationally by the Kho Kho Federation. It’s increasingly being recognized in multi-nation events like the South Asian Games."
+    ],
+    [
       "What is the kho command?",
       "The kho command is a verbal cue given by the active chaser to a seated teammate to activate them as the next chaser. The command must be given correctly, and the chaser must pass from behind the teammate while giving the kho. The correct timing and positioning of the kho are crucial for maintaining momentum."
     ],
@@ -171,6 +175,14 @@
     [
       "Explain step by step how Kho-Kho game is played",
       "1. The game is played between two teams, each with 12 players, but only 9 from the chasing team take the field at a time.\n2. The match starts with a toss; the winning team decides whether to chase or defend first.\n3. 8 chasers sit in a straight line on the central lane, facing alternating directions, while 1 chaser remains active to tag defenders.\n4. Three defenders from the opposing team enter the field and try to evade being tagged.\n5. The active chaser can run around the field in one direction and tag a defender or pass the chase to a sitting teammate by giving a \"kho\" (touching the back and saying 'kho').\n6. The sitting player then becomes the new active chaser and continues the chase.\n7. If a defender is tagged or steps out of the boundary, they are declared out.\n8. Once all three defenders are out, the next batch of three defenders enters.\n9. Each turn lasts 9 minutes for chasing and defending. The teams switch roles after each inning.\n10. The team with the most points (number of defenders tagged) at the end of both innings wins the match."
-    ]       
+    ],
+    [
+      "Who developed you?",
+      "Sarosh Arif, from Pakistan"
+    ], 
+    [
+      "What is your purpose?",
+      "To answer questions about a popular game played in subcontinant called Kho-Kho."
+    ]   
   ]
 }
