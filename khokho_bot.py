@@ -14,7 +14,7 @@ from langchain_community.llms import HuggingFacePipeline
 # --- Configuration ---
 SECRET_KEY = os.getenv("KHO_KHO_BOT_SECRET", "replace-with-secure-random-key")
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-LLM_MODEL = "google/flan-t5-small"
+LLM_MODEL = "google/flan-t5-base"
 JSON_DATA_FILE = os.getenv("KHO_KHO_DATA_FILE", "kho-kho.json")
 MAX_TOKENS = int(os.getenv("KHO_KHO_MAX_TOKENS", "128"))
 
